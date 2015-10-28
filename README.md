@@ -5,6 +5,8 @@
 
 ## Example
 
+  Boot a hidden electron instance, log to stdout and clean up:
+
 ```js
 var electron = require('electron-stream');
 

@@ -7,7 +7,9 @@ var resolve = require('path').resolve;
 var source = 'file://' + join(__dirname, 'script.html?source=' + resolve(process.argv[2]));
 
 app.on('ready', function(){
-  var mainWindow = new BrowserWindow({});
+  var mainWindow = new BrowserWindow({
+    show: false
+  });
   mainWindow.loadUrl(source);
   mainWindow.openDevTools();
 });
