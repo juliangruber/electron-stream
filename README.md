@@ -12,12 +12,27 @@ var electron = require('electron-stream');
 
 var browser = electron();
 
-browser.stdout.pipe(process.stdout);
-browser.stderr.pipe(process.stderr);
+browser.pipe(process.stdout);
 
 browser.write('console.log(window.location.href)');
 browser.write('window.close();');
 browser.end();
+```
+
+## Output streams
+
+`electron-stream` lets you read all of the console output together, or split up into `stdout` and `stderr`:
+
+```js
+// console.log and console.error
+browser.pipe(...);
+browser.stdall.pipe(...);
+
+// console.log only
+browser.stdout.pipe(...);
+
+// console.error only
+browser.stderr.pipe(...);
 ```
 
 ## Installation
@@ -43,8 +58,9 @@ var browser = electron(prebuilt);
 
 ### electron#stdout
 ### electron#stderr
+### electron#stdall
 
-Readable streams containing the console output. `console.log` will be forwarded to `.stdout`, `console.error` to `.stderr`
+Readable streams containing the console output. `console.log` will be forwarded to `.stdout`, `console.error` to `.stderr`. `.stdall` has them both.
 
 ### electron#kill()
 

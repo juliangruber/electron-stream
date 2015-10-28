@@ -1,22 +1,24 @@
 var spawn = require('child_process').spawn;
-var Writable = require('stream').Writable;
+var Duplex = require('stream').Duplex;
 var PassThrough = require('stream').PassThrough;
 var fs = require('fs');
 var tmpdir = require('os').tmpdir;
 var join = require('path').join;
 var inherits = require('util').inherits;
+var read = require('stream-read');
 
 module.exports = Electron;
-inherits(Electron, Writable);
+inherits(Electron, Duplex);
 
 function Electron(path){
   if (!(this instanceof Electron)) return new Electron(path);
-  Writable.call(this);
+  Duplex.call(this);
 
   this.source = '';
   this.ps = null;
   this.stdout = PassThrough();
   this.stderr = PassThrough();
+  this.stdall = PassThrough();
   this.killed = false;
   this.path = path || 'electron';
 
@@ -26,6 +28,14 @@ function Electron(path){
 Electron.prototype._write = function(chunk, _, done){
   this.source += chunk.toString();
   done();
+};
+
+Electron.prototype._read = function(){
+  var self = this;
+  read(this.stdall, function(err, data){
+    if (err) return self.emit('error', err);
+    self.push(data);
+  });
 };
 
 Electron.prototype._onfinish = function(){
@@ -45,8 +55,13 @@ Electron.prototype._onfinish = function(){
 
 Electron.prototype._spawn = function(file){
   var ps = this.ps = spawn(this.path, [join(__dirname, 'script.js'), file]);
+
   ps.stdout.pipe(this.stdout);
   ps.stderr.pipe(this.stderr);
+
+  ps.stdout.pipe(this.stdall);
+  ps.stderr.pipe(this.stdall);
+
   ps.on('exit', this.emit.bind(this, 'exit'));
 };
 

@@ -24,6 +24,34 @@ test('stderr', function(t){
   browser.end('console.error(window.location.href);window.close()');
 });
 
+test('stdall', function(t){
+  var browser = electron();
+
+  browser.stdall.pipe(concat(function(data){
+    t.ok(data.toString().indexOf('log') > -1);
+    t.ok(data.toString().indexOf('error') > -1);
+    t.end();
+  }));
+
+  browser.write('console.log("log");');
+  browser.write('console.error("error");');
+  browser.end('window.close();');
+});
+
+test('duplex', function(t){
+  var browser = electron();
+
+  browser.pipe(concat(function(data){
+    t.ok(data.toString().indexOf('log') > -1);
+    t.ok(data.toString().indexOf('error') > -1);
+    t.end();
+  }));
+
+  browser.write('console.log("log");');
+  browser.write('console.error("error");');
+  browser.end('window.close();');
+});
+
 test('exit event', function(t){
   var browser = electron();
 
