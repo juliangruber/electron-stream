@@ -5,7 +5,6 @@ var fs = require('fs');
 var tmpdir = require('os').tmpdir;
 var join = require('path').join;
 var inherits = require('util').inherits;
-var kill = require('tree-kill');
 
 module.exports = Electron;
 inherits(Electron, Writable);

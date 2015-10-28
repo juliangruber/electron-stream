@@ -11,8 +11,5 @@
     "electron-prebuilt": "^0.34.1",
     "tape": "^4.2.2"
   },
-  "license": "MIT",
-  "dependencies": {
-    "tree-kill": "^1.0.0"
-  }
+  "license": "MIT"
 }
