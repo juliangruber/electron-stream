@@ -39,12 +39,16 @@ Electron.prototype._onfinish = function(){
   fs.writeFile(file, self.source, function(err){
     if (self.killed) return;
     if (err) return dup.emit('error', err);
-
-    var ps = self.ps = spawn(self.path, [join(__dirname, 'script.js'), file]);
-    ps.stdout.pipe(self.stdout);
-    ps.stderr.pipe(self.stderr);
-    ps.on('exit', self.emit.bind(self, 'exit'));
+    
+    self._spawn(file);
   });
+};
+
+Electron.prototype._spawn = function(file){
+  var ps = this.ps = spawn(this.path, [join(__dirname, 'script.js'), file]);
+  ps.stdout.pipe(this.stdout);
+  ps.stderr.pipe(this.stderr);
+  ps.on('exit', this.emit.bind(this, 'exit'));
 };
 
 Electron.prototype.kill = function(){
