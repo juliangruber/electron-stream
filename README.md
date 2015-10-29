@@ -50,7 +50,7 @@ Create a writable stream around a newly spawned `electron` which forwards writte
 Specify `path` to provide a custom executable path, useful for example with [electron-prebuilt](https://npmjs.org/package/electron-prebuilt):
 
 ```js
-var prebuilt = require('electron-preubilt');
+var prebuilt = require('electron-prebuilt');
 var electron = require('electron-stream');
 
 var browser = electron(prebuilt);
