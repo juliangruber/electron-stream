@@ -10,6 +10,8 @@ var prebuilt = require('electron-prebuilt');
 var fmt = require('util').format;
 var http = require('http');
 
+var runner = join(__dirname, 'lib', 'runner.js');
+
 module.exports = Electron;
 inherits(Electron, Duplex);
 
@@ -57,11 +59,9 @@ Electron.prototype._spawn = function(){
   server.listen(function(){
     var port = server.address().port;
 
-    var ps = self.ps = spawn(
-      prebuilt,
-      [join(__dirname, 'script.js')],
-      { stdio: [null, null, null, 'ipc'] }
-    );
+    var ps = self.ps = spawn(prebuilt, [runner], {
+      stdio: [null, null, null, 'ipc']
+    });
 
     ps.on('exit', self._exit.bind(self));
 
