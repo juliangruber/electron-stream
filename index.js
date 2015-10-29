@@ -2,12 +2,10 @@ var spawn = require('child_process').spawn;
 var Duplex = require('stream').Duplex;
 var PassThrough = require('stream').PassThrough;
 var fs = require('fs');
-var tmpdir = require('os').tmpdir;
 var join = require('path').join;
 var inherits = require('util').inherits;
 var read = require('stream-read');
 var prebuilt = require('electron-prebuilt');
-var fmt = require('util').format;
 var http = require('http');
 
 var runner = join(__dirname, 'lib', 'runner.js');
@@ -73,7 +71,6 @@ Electron.prototype._spawn = function(){
       }
     });
   });
-
 };
 
 Electron.prototype.kill = function(){
