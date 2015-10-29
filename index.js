@@ -6,21 +6,27 @@ var tmpdir = require('os').tmpdir;
 var join = require('path').join;
 var inherits = require('util').inherits;
 var read = require('stream-read');
+var ipc = require('./ipc');
+var prebuilt = require('electron-prebuilt');
+var fmt = require('util').format;
+var http = require('http');
 
 module.exports = Electron;
 inherits(Electron, Duplex);
 
-function Electron(path){
-  if (!(this instanceof Electron)) return new Electron(path);
+function Electron(){
+  if (!(this instanceof Electron)) return new Electron();
   Duplex.call(this);
 
   this.source = '';
   this.ps = null;
-  this.stdout = PassThrough();
-  this.stderr = PassThrough();
+  this.server = null;
   this.stdall = PassThrough();
+  this.stdout = PassThrough();
+  this.stdout.pipe(this.stdall);
+  this.stderr = PassThrough();
+  this.stderr.pipe(this.stdall);
   this.killed = false;
-  this.path = path || 'electron';
 
   this.on('finish', this._onfinish.bind(this));
 }
@@ -40,29 +46,36 @@ Electron.prototype._read = function(){
 
 Electron.prototype._onfinish = function(){
   if (this.killed) return;
-
-  var self = this;
-  var rand = Math.random().toString(16).slice(2);
-  var file = join(tmpdir(), 'electron-stream:' + rand);
-
-  fs.writeFile(file, self.source, function(err){
-    if (self.killed) return;
-    if (err) return dup.emit('error', err);
-    
-    self._spawn(file);
-  });
+  this._spawn();
 };
 
-Electron.prototype._spawn = function(file){
-  var ps = this.ps = spawn(this.path, [join(__dirname, 'script.js'), file]);
+Electron.prototype._spawn = function(){
+  var self = this;
 
-  ps.stdout.pipe(this.stdout);
-  ps.stderr.pipe(this.stderr);
+  var server = self.server = http.createServer(function(req, res){
+    res.end('<script>' + self.source + '</script>');
+  });
+  server.listen(function(){
+    var port = server.address().port;
 
-  ps.stdout.pipe(this.stdall);
-  ps.stderr.pipe(this.stdall);
+    var ps = self.ps = spawn(
+      prebuilt,
+      [join(__dirname, 'script.js')],
+      { stdio: [null, null, null, 'ipc'] }
+    );
 
-  ps.on('exit', this.emit.bind(this, 'exit'));
+    ps.on('exit', self._exit.bind(self));
+
+    var child = ipc(ps);
+
+    child.on('ready', function(){
+      child.emit('goto', 'http://localhost:' + port + '/');
+    });
+
+    child.on('stdout', self.stdout.write.bind(self.stdout));
+    child.on('stderr', self.stderr.write.bind(self.stderr));
+  });
+
 };
 
 Electron.prototype.kill = function(){
@@ -71,3 +84,9 @@ Electron.prototype.kill = function(){
   this.killed = true;
 };
 
+Electron.prototype._exit = function(code, sig){
+  this.stdout.push(null);
+  this.stderr.push(null);
+  this.server.close();
+  this.emit('exit', code, sig);
+};

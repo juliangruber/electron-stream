@@ -6,22 +6,22 @@ test('stdout', function(t){
   var browser = electron();
 
   browser.stdout.on('data', function(l){
-    t.ok(l.toString().indexOf('file') > -1);
+    t.equal(l.toString(), 'log\n');
     t.end();
   });
 
-  browser.end('console.log(window.location.href);window.close()');
+  browser.end('console.log("log");window.close()');
 });
 
 test('stderr', function(t){
   var browser = electron();
 
   browser.stderr.on('data', function(l){
-    t.ok(l.toString().indexOf('file') > -1);
+    t.equal(l.toString(), 'error\n');
     t.end();
   });
 
-  browser.end('console.error(window.location.href);window.close()');
+  browser.end('console.error("error");window.close()');
 });
 
 test('stdall', function(t){
@@ -37,6 +37,7 @@ test('stdall', function(t){
   browser.write('console.error("error");');
   browser.end('window.close();');
 });
+
 
 test('duplex', function(t){
   var browser = electron();

@@ -3,21 +3,29 @@ var BrowserWindow = require('browser-window');
 var ipc = require('ipc');
 var join = require('path').join;
 var resolve = require('path').resolve;
+var parent = require('./ipc')(process);
 
-var source = 'file://' + join(__dirname, 'script.html?source=' + resolve(process.argv[2]));
+var win;
 
 app.on('ready', function(){
-  var mainWindow = new BrowserWindow({
-    show: false
+  win = new BrowserWindow({
+    show: false,
+    preload: join(__dirname + '/preload.js'),
+    'node-integration': false
   });
-  mainWindow.loadUrl(source);
-  mainWindow.openDevTools();
+  
+  parent.on('goto', function(path){
+    win.loadUrl(path);
+    win.openDevTools();
+  });
+
+  parent.emit('ready');
 });
 
 ipc.on('stdout', function(_, data){
-  console.log.apply(null, data);
+  parent.emit('stdout', data);
 });
 
 ipc.on('stderr', function(_, data){
-  console.error.apply(null, data);
+  parent.emit('stderr', data);
 });
