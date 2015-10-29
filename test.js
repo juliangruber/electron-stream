@@ -100,3 +100,22 @@ test('uncaught error', function(t){
   browser.end('throw new Error(\'bar\')');
 });
 
+test('no node integraetion', function(t){
+  var browser = electron();
+  browser.pipe(concat(function(data){
+    t.ok(data.toString().indexOf('ReferenceError') > -1);
+    t.end();
+  }));
+  browser.end('console.log(!!process.version);window.close();');
+});
+
+test('node integraetion', function(t){
+  var browser = electron({
+    'node-integration': true
+  });
+  browser.pipe(concat(function(data){
+    t.equal(data.toString(), 'true\n');
+    t.end();
+  }));
+  browser.end('console.log(!!process.version);window.close();');
+});

@@ -13,10 +13,11 @@ var runner = join(__dirname, 'lib', 'runner.js');
 module.exports = Electron;
 inherits(Electron, Duplex);
 
-function Electron(){
-  if (!(this instanceof Electron)) return new Electron();
+function Electron(opts){
+  if (!(this instanceof Electron)) return new Electron(opts);
   Duplex.call(this);
 
+  this.opts = opts || {};
   this.source = '';
   this.ps = null;
   this.server = null;
@@ -62,7 +63,8 @@ Electron.prototype._spawn = function(url){
 
   ps.on('message', function(msg){
     switch (msg[0]) {
-      case 'ready': ps.send(['goto', url]); break;
+      case 'ready': ps.send(['init', self.opts]); break;
+      case 'initialized': ps.send(['goto', url]); break;
       case 'stdout': self.stdout.write(msg[1]); break;
       case 'stderr': self.stderr.write(msg[1]); break;
     }

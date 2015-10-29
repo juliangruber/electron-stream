@@ -43,9 +43,14 @@ $ npm install electron-stream
 
 ## API
 
-### electron()
+### electron([opts])
 
 Create a writable stream around a newly spawned `electron` which forwards written data to `electron`. This module bundles [electron-prebuilt](https://npmjs.org/package/electron-prebuilt).
+
+Options:
+
+  - `show`: Show the electron window. Defaults to `false`.
+  - `'node-integration'`:  Enable node integration. Defaults to `false`.
 
 ### electron#stdout
 ### electron#stderr
