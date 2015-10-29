@@ -43,18 +43,9 @@ $ npm install electron-stream
 
 ## API
 
-### electron([path])
+### electron()
 
-Create a writable stream around a newly spawned `electron` which forwards written data to `electron`.
-
-Specify `path` to provide a custom executable path, useful for example with [electron-prebuilt](https://npmjs.org/package/electron-prebuilt):
-
-```js
-var prebuilt = require('electron-prebuilt');
-var electron = require('electron-stream');
-
-var browser = electron(prebuilt);
-```
+Create a writable stream around a newly spawned `electron` which forwards written data to `electron`. This module bundles [electron-prebuilt](https://npmjs.org/package/electron-prebuilt).
 
 ### electron#stdout
 ### electron#stderr
