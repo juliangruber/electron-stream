@@ -3,7 +3,6 @@ var BrowserWindow = require('browser-window');
 var ipc = require('ipc');
 var join = require('path').join;
 var resolve = require('path').resolve;
-var parent = require('./ipc')(process);
 
 var win;
 
@@ -14,18 +13,17 @@ app.on('ready', function(){
     'node-integration': false
   });
   
-  parent.on('goto', function(path){
-    win.loadUrl(path);
-    win.openDevTools();
+  process.on('message', function(msg){
+    win.loadUrl(msg[1]);
   });
 
-  parent.emit('ready');
+  process.send(['ready']);
 });
 
 ipc.on('stdout', function(_, data){
-  parent.emit('stdout', data);
+  process.send(['stdout', data]);
 });
 
 ipc.on('stderr', function(_, data){
-  parent.emit('stderr', data);
+  process.send(['stderr', data]);
 });

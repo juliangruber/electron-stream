@@ -6,7 +6,6 @@ var tmpdir = require('os').tmpdir;
 var join = require('path').join;
 var inherits = require('util').inherits;
 var read = require('stream-read');
-var ipc = require('./ipc');
 var prebuilt = require('electron-prebuilt');
 var fmt = require('util').format;
 var http = require('http');
@@ -66,14 +65,13 @@ Electron.prototype._spawn = function(){
 
     ps.on('exit', self._exit.bind(self));
 
-    var child = ipc(ps);
-
-    child.on('ready', function(){
-      child.emit('goto', 'http://localhost:' + port + '/');
+    ps.on('message', function(msg){
+      switch (msg[0]) {
+        case 'ready': ps.send(['goto', 'http://localhost:' + port + '/']); break;
+        case 'stdout': self.stdout.write(msg[1]); break;
+        case 'stderr': self.stderr.write(msg[1]); break;
+      }
     });
-
-    child.on('stdout', self.stdout.write.bind(self.stdout));
-    child.on('stderr', self.stderr.write.bind(self.stderr));
   });
 
 };
