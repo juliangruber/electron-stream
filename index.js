@@ -44,32 +44,40 @@ Electron.prototype._read = function(){
 };
 
 Electron.prototype._onfinish = function(){
+  var self = this;
   if (this.killed) return;
-  this._spawn();
+
+  this._listen(function(_, url){
+    self._spawn(url);
+  });
 };
 
-Electron.prototype._spawn = function(){
+Electron.prototype._spawn = function(url){
   var self = this;
+  var ps = self.ps = spawn(prebuilt, [runner], {
+    stdio: [null, null, null, 'ipc']
+  });
 
-  var server = self.server = http.createServer(function(req, res){
+  ps.on('exit', self._exit.bind(self));
+
+  ps.on('message', function(msg){
+    switch (msg[0]) {
+      case 'ready': ps.send(['goto', url]); break;
+      case 'stdout': self.stdout.write(msg[1]); break;
+      case 'stderr': self.stderr.write(msg[1]); break;
+    }
+  });
+};
+
+Electron.prototype._listen = function(cb){
+  var self = this;
+  var server = http.createServer(function(req, res){
     res.end('<script>' + self.source + '</script>');
   });
+  this.server = server;
   server.listen(function(){
     var port = server.address().port;
-
-    var ps = self.ps = spawn(prebuilt, [runner], {
-      stdio: [null, null, null, 'ipc']
-    });
-
-    ps.on('exit', self._exit.bind(self));
-
-    ps.on('message', function(msg){
-      switch (msg[0]) {
-        case 'ready': ps.send(['goto', 'http://localhost:' + port + '/']); break;
-        case 'stdout': self.stdout.write(msg[1]); break;
-        case 'stderr': self.stderr.write(msg[1]); break;
-      }
-    });
+    cb(null, 'http://localhost:' + port + '/');
   });
 };
 
