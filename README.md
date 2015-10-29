@@ -59,7 +59,7 @@ To use electron on travis, add this to your travis.yml:
 ```yml
 addons:
   apt:
-    pacakges:
+    packages:
       - xvfb
 install:
   - export DISPLAY=':99.0'
