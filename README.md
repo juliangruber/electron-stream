@@ -3,6 +3,8 @@
 
   Write JavaScript to `electron`, get console output back!
 
+  [![travis](https://travis-ci.org/juliangruber/electron-stream.svg?branch=master)](https://travis-ci.org/juliangruber/electron-stream)
+
 ## Example
 
   Boot a hidden electron instance, log to stdout and clean up:
