@@ -37,8 +37,17 @@ browser.stderr.pipe(...);
 
 ## Installation
 
+  To install as a library:
+
 ```bash
 $ npm install electron-stream
+```
+
+  To install as a binary:
+
+```bash
+$ npm install -g electron-stream
+$ echo "console.log('foo');window.close()" | electron-stream
 ```
 
 ## API

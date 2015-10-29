@@ -14,5 +14,8 @@
   "license": "MIT",
   "dependencies": {
     "stream-read": "^1.1.2"
+  },
+  "bin": {
+    "electron-stream": "bin/bin.js"  
   }
 }
