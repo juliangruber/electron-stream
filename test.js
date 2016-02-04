@@ -38,7 +38,6 @@ test('stdall', function(t){
   browser.end('window.close();');
 });
 
-
 test('duplex', function(t){
   var browser = electron();
 
@@ -118,4 +117,17 @@ test('node integraetion', function(t){
     t.end();
   }));
   browser.end('console.log(!!process.version);window.close();');
+});
+
+test('BrowserWindow options support', function(t){
+  var browser = electron({
+    height: 500
+  });
+
+  browser.stdall.on('data', function(l){
+    t.equal(l.toString(), '500\n');
+    t.end();
+  });
+
+  browser.end('console.log(window.outerHeight); window.close()');
 });
