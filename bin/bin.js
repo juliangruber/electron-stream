@@ -2,7 +2,9 @@
 
 var electron = require('..');
 
-var browser = electron();
+var browser = electron({
+  show: false
+});
 
 process.stdin.pipe(browser);
 browser.stdout.pipe(process.stdout);

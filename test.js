@@ -100,7 +100,11 @@ test('uncaught error', function(t){
 });
 
 test('no node integraetion', function(t){
-  var browser = electron();
+  var browser = electron({
+    webPreferences: {
+      'nodeIntegration': false
+    }
+  });
   browser.pipe(concat(function(data){
     t.ok(data.toString().indexOf('ReferenceError') > -1);
     t.end();
@@ -109,9 +113,7 @@ test('no node integraetion', function(t){
 });
 
 test('node integraetion', function(t){
-  var browser = electron({
-    'node-integration': true
-  });
+  var browser = electron();
   browser.pipe(concat(function(data){
     t.equal(data.toString(), 'true\n');
     t.end();
