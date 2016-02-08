@@ -13,9 +13,7 @@
 ```js
 var electron = require('electron-stream');
 
-var browser = electron({
-  show: false  
-});
+var browser = electron();
 
 browser.pipe(process.stdout);
 
@@ -80,6 +78,7 @@ Create a writable stream around a newly spawned `electron` which forwards writte
 
 Options:
   - [Electron window](https://github.com/atom/electron/blob/master/docs/api/browser-window.md#new-browserwindowoptions) options
+  - `show` is `false` by default
 
 ### electron#stdout
 ### electron#stderr
