@@ -8,7 +8,7 @@
   "repository": "juliangruber/electron-stream",
   "devDependencies": {
     "concat-stream": "^1.5.1",
-    "electron-prebuilt": "^0.35.5",
+    "electron-prebuilt": "^0.36.12",
     "tape": "^4.2.2"
   },
   "license": "MIT",
