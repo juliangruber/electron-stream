@@ -79,7 +79,7 @@ Create a writable stream around a newly spawned `electron` which forwards writte
 Options:
 
   - `show`: Show the electron window. Defaults to `false`.
-  - `'node-integration'`:  Enable node integration. Defaults to `false`.
+  - `nodeIntegration`:  Enable node integration. Defaults to `false`.
 
 ### electron#stdout
 ### electron#stderr

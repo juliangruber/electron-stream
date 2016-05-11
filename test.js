@@ -111,7 +111,7 @@ test('no node integraetion', function(t){
 
 test('node integraetion', function(t){
   var browser = electron({
-    'node-integration': true
+    nodeIntegration: true
   });
   browser.pipe(concat(function(data){
     t.equal(data.toString(), 'true\n');
