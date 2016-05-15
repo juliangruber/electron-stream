@@ -17,7 +17,7 @@ var browser = electron();
 
 browser.pipe(process.stdout);
 
-browser.write('console.log(window.location.href)');
+browser.write('console.log(window.location.href);');
 browser.write('window.close();');
 browser.end();
 ```
