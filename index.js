@@ -18,7 +18,7 @@ function Electron(opts){
   Duplex.call(this);
 
   this.opts = opts || {};
-  this.source = '';
+  this.source = new PassThrough();
   this.ps = null;
   this.server = null;
   this.stdall = PassThrough();
@@ -32,7 +32,7 @@ function Electron(opts){
 }
 
 Electron.prototype._write = function(chunk, _, done){
-  this.source += chunk.toString();
+  this.source.push(chunk);
   done();
 };
 
@@ -47,6 +47,7 @@ Electron.prototype._read = function(){
 Electron.prototype._onfinish = function(){
   var self = this;
   if (this.killed) return;
+  this.source.push(null);
 
   this._listen(function(_, url){
     self._spawn(url);
@@ -74,7 +75,12 @@ Electron.prototype._spawn = function(url){
 Electron.prototype._listen = function(cb){
   var self = this;
   var server = http.createServer(function(req, res){
-    res.end('<script>' + self.source + '</script>');
+    res.write('<script>');
+    self.source
+    .on('end', function () {
+      res.end('</script>');
+    })
+    .pipe(res, { end: false });
   });
   this.server = server;
   server.listen(function(){
