@@ -5,7 +5,7 @@ var fs = require('fs');
 var join = require('path').join;
 var inherits = require('util').inherits;
 var read = require('stream-read');
-var prebuilt = require('electron-prebuilt');
+var electron = require('electron');
 var http = require('http');
 
 var runner = join(__dirname, 'lib', 'runner.js');
@@ -56,7 +56,7 @@ Electron.prototype._onfinish = function(){
 
 Electron.prototype._spawn = function(url){
   var self = this;
-  var ps = self.ps = spawn(prebuilt, [runner], {
+  var ps = self.ps = spawn(electron, [runner], {
     stdio: [null, null, null, 'ipc']
   });
 
