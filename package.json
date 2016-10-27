@@ -13,6 +13,7 @@
   "license": "MIT",
   "dependencies": {
     "electron-prebuilt": "^1.0.0",
+    "snippet-stream": "^1.0.2",
     "stream-read": "^1.1.2"
   },
   "bin": {

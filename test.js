@@ -1,7 +1,7 @@
 var electron = require('./');
 var test = require('tape');
 var concat = require('concat-stream');
-
+/*
 test('stdout', function(t){
   var browser = electron();
 
@@ -118,4 +118,15 @@ test('node integraetion', function(t){
     t.end();
   }));
   browser.end('console.log(!!process.version);window.close();');
+});
+*/
+test('interactive mode', function(t){
+  var browser = electron({
+    interactive: true
+  });
+  browser.once('data', function(data){
+    t.equal(data.toString('hey'));
+    t.end();
+  });
+  browser.write('console.log("hey");\n')
 });

@@ -7,6 +7,7 @@ var inherits = require('util').inherits;
 var read = require('stream-read');
 var prebuilt = require('electron-prebuilt');
 var http = require('http');
+var snippets = require('snippet-stream');
 
 var runner = join(__dirname, 'lib', 'runner.js');
 
@@ -29,6 +30,7 @@ function Electron(opts){
   this.killed = false;
 
   this.on('finish', this._onfinish.bind(this));
+  if (this.opts.interactive) this._spawn();
 }
 
 Electron.prototype._write = function(chunk, _, done){
@@ -49,6 +51,7 @@ Electron.prototype._onfinish = function(){
   if (this.killed) return;
   this.source.push(null);
 
+  if (this.opts.interactive) return;
   this._listen(function(_, url){
     self._spawn(url);
   });
@@ -65,7 +68,19 @@ Electron.prototype._spawn = function(url){
   ps.on('message', function(msg){
     switch (msg[0]) {
       case 'ready': ps.send(['init', self.opts]); break;
-      case 'initialized': ps.send(['goto', url]); break;
+      case 'initialized':
+        if (self.opts.interactive) {
+          self.source
+          .on('data', function(buf){console.log('buf',buf.toString())})
+          .pipe(snippets())  
+          .on('data', function(snippet){
+            console.log('SNIPPET', snippet)
+            ps.send(['execute', snippet])
+          });
+        } else {
+          ps.send(['goto', url]);
+        }
+        break;
       case 'stdout': self.stdout.write(msg[1]); break;
       case 'stderr': self.stderr.write(msg[1]); break;
     }
@@ -77,7 +92,7 @@ Electron.prototype._listen = function(cb){
   var server = http.createServer(function(req, res){
     res.write('<script>');
     self.source
-    .on('end', function () {
+    .on('end', function(){
       res.end('</script>');
     })
     .pipe(res, { end: false });
