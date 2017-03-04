@@ -13,6 +13,7 @@
   },
   "license": "MIT",
   "dependencies": {
+    "debug": "^2.6.1",
     "electron": "^1.4.4",
     "stream-read": "^1.1.2"
   },

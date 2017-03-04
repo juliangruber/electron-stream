@@ -7,6 +7,7 @@ var inherits = require('util').inherits;
 var read = require('stream-read');
 var electron = require('electron');
 var http = require('http');
+var debug = require('debug')('electron-stream');
 
 var runner = join(__dirname, 'lib', 'runner.js');
 
@@ -56,6 +57,8 @@ Electron.prototype._onfinish = function(){
 };
 
 Electron.prototype._spawn = function(url){
+  debug('spawn %s', url);
+
   var self = this;
   var ps = self.ps = spawn(electron, [runner], {
     stdio: [null, null, null, 'ipc']
