@@ -131,3 +131,15 @@ test('require node modules', function(t){
   }));
   browser.end('console.log(!!require.resolve("tape"));window.close();');
 });
+
+test('circular structure in opts', function(t){
+  var o = {}
+  o.o = o
+
+  var browser = electron(o);
+  browser.pipe(concat(function(data){
+    t.equal(data.toString(), 'true\n');
+    t.end();
+  }));
+  browser.end('console.log(true);window.close();');
+});

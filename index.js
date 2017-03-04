@@ -7,6 +7,7 @@ var inherits = require('util').inherits;
 var read = require('stream-read');
 var electron = require('electron');
 var debug = require('debug')('electron-stream');
+var stringify = require('json-stringify-safe');
 
 var runner = join(__dirname, 'lib', 'runner.js');
 
@@ -67,7 +68,7 @@ Electron.prototype._spawn = function(url){
 
   ps.on('message', function(msg){
     switch (msg[0]) {
-      case 'ready': ps.send(['init', self.opts]); break;
+      case 'ready': ps.send(['init', stringify(self.opts)]); break;
       case 'initialized': ps.send(['goto', url]); break;
       case 'stdout': self.stdout.write(msg[1]); break;
       case 'stderr': self.stderr.write(msg[1]); break;
