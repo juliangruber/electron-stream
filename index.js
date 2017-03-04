@@ -18,6 +18,7 @@ function Electron(opts){
   Duplex.call(this);
 
   this.opts = opts || {};
+  this.opts.nodeIntegration = this.opts.node;
   this.source = new PassThrough();
   this.ps = null;
   this.server = null;

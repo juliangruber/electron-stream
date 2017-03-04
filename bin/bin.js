@@ -4,9 +4,10 @@ var electron = require('..');
 var minimist = require('minimist');
 
 var argv = minimist(process.argv.slice(2), {
-  boolean: 'node-integration',
+  boolean: 'node',
   alias: {
-    nodeIntegration: 'node-integration'
+    nodeIntegration: 'node',
+    'node-integration': 'node'
   }
 });
 var browser = electron(argv);
