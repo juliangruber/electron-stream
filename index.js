@@ -6,7 +6,6 @@ var join = require('path').join;
 var inherits = require('util').inherits;
 var read = require('stream-read');
 var electron = require('electron');
-var http = require('http');
 var debug = require('debug')('electron-stream');
 
 var runner = join(__dirname, 'lib', 'runner.js');
@@ -19,8 +18,10 @@ function Electron(opts){
   Duplex.call(this);
 
   this.opts = opts || {};
-  this.opts.nodeIntegration = this.opts.node;
+  this.opts.nodeIntegration = this.opts.nodeIntegration || this.opts.node;
   this.source = new PassThrough();
+  this.basedir = this.opts.basedir || process.cwd();
+  this.sourceFile = join(this.basedir, '.source.' + Date.now() + '.html');
   this.ps = null;
   this.server = null;
   this.stdall = PassThrough();
@@ -51,9 +52,7 @@ Electron.prototype._onfinish = function(){
   if (this.killed) return;
   this.source.push(null);
 
-  this._listen(function(_, url){
-    self._spawn(url);
-  });
+  self._spawn(self._createSourceUrl());
 };
 
 Electron.prototype._spawn = function(url){
@@ -76,21 +75,15 @@ Electron.prototype._spawn = function(url){
   });
 };
 
-Electron.prototype._listen = function(cb){
-  var self = this;
-  var server = http.createServer(function(req, res){
-    res.write('<script>');
-    self.source
+Electron.prototype._createSourceUrl = function(){
+  var ws = fs.createWriteStream(this.sourceFile);
+  ws.write('<script>');
+  this.source
     .on('end', function () {
-      res.end('</script>');
+      ws.end('</script>');
     })
-    .pipe(res, { end: false });
-  });
-  this.server = server;
-  server.listen(function(){
-    var port = server.address().port;
-    cb(null, 'http://localhost:' + port + '/');
-  });
+    .pipe(ws, { end: false });
+  return 'file://' + this.sourceFile;
 };
 
 Electron.prototype.kill = function(){
@@ -100,8 +93,12 @@ Electron.prototype.kill = function(){
 };
 
 Electron.prototype._exit = function(code, sig){
-  this.stdout.push(null);
-  this.stderr.push(null);
-  this.server.close();
-  this.emit('exit', code, sig);
+  var self = this;
+  fs.unlink(this.sourceFile, function (err) {
+    if (err) return self.emit('error', err);
+    self.stdout.push(null);
+    self.stderr.push(null);
+    debug('exit %s %s', code, sig);
+    self.emit('exit', code, sig);
+  })
 };

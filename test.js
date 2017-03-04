@@ -119,3 +119,15 @@ test('node integraetion', function(t){
   }));
   browser.end('console.log(!!process.version);window.close();');
 });
+
+test('require node modules', function(t){
+  var browser = electron({
+    nodeIntegration: true,
+    basedir: __dirname
+  });
+  browser.pipe(concat(function(data){
+    t.equal(data.toString(), 'true\n');
+    t.end();
+  }));
+  browser.end('console.log(!!require.resolve("tape"));window.close();');
+});

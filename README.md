@@ -80,6 +80,7 @@ Options:
 
   - `show`: Show the electron window. Defaults to `false`.
   - `node`:  Enable node integration. Defaults to `false`.
+  - `basedir`: Set this if you need to require node modules in `node` mode
 
 ### electron#stdout
 ### electron#stderr
