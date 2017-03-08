@@ -143,3 +143,12 @@ test('circular structure in opts', function(t){
   }));
   browser.end('console.log(true);window.close();');
 });
+
+test('access document.body', function(t){
+  var browser = electron();
+  browser.pipe(concat(function(data){
+    t.equal(data.toString(), 'true\n');
+    t.end();
+  }));
+  browser.end('console.log(!!document.body);window.close();');
+});

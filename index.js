@@ -81,13 +81,13 @@ Electron.prototype._spawn = function(url){
 Electron.prototype._createSourceUrl = function(cb){
   var self = this;
   var ws = fs.createWriteStream(this.sourceFile);
-  ws.write('<script>');
+  ws.write('<body><script>');
   this.source
     .on('end', function () {
       ws.on('finish', function(){
         cb('file://' + self.sourceFile);
       });
-      ws.end('</script>');
+      ws.end('</script></body>');
     })
     .pipe(ws, { end: false });
 };
