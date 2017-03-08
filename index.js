@@ -53,7 +53,9 @@ Electron.prototype._onfinish = function(){
   if (this.killed) return;
   this.source.push(null);
 
-  self._spawn(self._createSourceUrl());
+  this._createSourceUrl(function(url){
+    self._spawn(url);
+  });
 };
 
 Electron.prototype._spawn = function(url){
@@ -76,15 +78,18 @@ Electron.prototype._spawn = function(url){
   });
 };
 
-Electron.prototype._createSourceUrl = function(){
+Electron.prototype._createSourceUrl = function(cb){
+  var self = this;
   var ws = fs.createWriteStream(this.sourceFile);
   ws.write('<script>');
   this.source
     .on('end', function () {
+      ws.on('finish', function(){
+        cb('file://' + self.sourceFile);
+      });
       ws.end('</script>');
     })
     .pipe(ws, { end: false });
-  return 'file://' + this.sourceFile;
 };
 
 Electron.prototype.kill = function(){
