@@ -92,7 +92,12 @@ Electron.prototype._createSourceUrl = function(cb){
     .pipe(ws, { end: false });
 };
 
+Electron.prototype._cleanup = function(){
+  fs.unlink(this.sourceFile, function (){});
+}
+
 Electron.prototype.kill = function(){
+  this._cleanup();
   if (this.ps) this.ps.kill();
   else this.emit('exit', 0);
   this.killed = true;
@@ -100,11 +105,9 @@ Electron.prototype.kill = function(){
 
 Electron.prototype._exit = function(code, sig){
   var self = this;
-  fs.unlink(this.sourceFile, function (err) {
-    if (err) return self.emit('error', err);
-    self.stdout.push(null);
-    self.stderr.push(null);
-    debug('exit %s %s', code, sig);
-    self.emit('exit', code, sig);
-  })
+  this._cleanup();
+  self.stdout.push(null);
+  self.stderr.push(null);
+  debug('exit %s %s', code, sig);
+  self.emit('exit', code, sig);
 };
