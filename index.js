@@ -81,7 +81,7 @@ Electron.prototype._spawn = function(url){
 Electron.prototype._createSourceUrl = function(cb){
   var self = this;
   var ws = fs.createWriteStream(this.sourceFile);
-  ws.write('<body><script>');
+  ws.write('<meta charset="utf8"><body><script>');
   this.source
     .on('end', function () {
       ws.on('finish', function(){

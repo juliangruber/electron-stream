@@ -152,3 +152,12 @@ test('access document.body', function(t){
   }));
   browser.end('console.log(!!document.body);window.close();');
 });
+
+test('utf8', function(t){
+  var browser = electron();
+  browser.pipe(concat(function(data){
+    t.equal(data.toString(), 'ಠ\n');
+    t.end();
+  }));
+  browser.end('var ಠ = "ಠ";console.log(ಠ);window.close();');
+});
