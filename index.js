@@ -8,6 +8,7 @@ var read = require('stream-read');
 var electron = require('electron');
 var debug = require('debug')('electron-stream');
 var stringify = require('json-stringify-safe');
+var http = require('http');
 
 var runner = join(__dirname, 'lib', 'runner.js');
 
@@ -81,11 +82,17 @@ Electron.prototype._spawn = function(url){
 Electron.prototype._createSourceUrl = function(cb){
   var self = this;
   var ws = fs.createWriteStream(this.sourceFile);
-  ws.write('<meta charset="utf8"><body><script>');
+  ws.write('<!DOCTYPE html><meta charset="utf8"><body><script>');
   this.source
     .on('end', function () {
       ws.on('finish', function(){
-        cb('file://' + self.sourceFile);
+        if (self.opts.nodeIntegration) return cb('file://' + self.sourceFile);
+        self.server = http.createServer(function(req, res){
+          fs.createReadStream(self.sourceFile).pipe(res);
+        });
+        self.server.listen(function(){
+          cb('http://localhost:' + this.address().port);
+        });
       });
       ws.end('</script></body>');
     })
@@ -93,6 +100,7 @@ Electron.prototype._createSourceUrl = function(cb){
 };
 
 Electron.prototype._cleanup = function(){
+  if (this.server) this.server.close();
   fs.unlink(this.sourceFile, function (){});
 }
 
