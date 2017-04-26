@@ -23,7 +23,7 @@ function Electron(opts){
   this.opts.nodeIntegration = this.opts.nodeIntegration || this.opts.node;
   this.source = new PassThrough();
   this.basedir = this.opts.basedir || process.cwd();
-  this.sourceFile = join(this.basedir, '.source.' + Date.now() + '.html');
+  this.sourceFile = join(this.basedir, '.source.' + Date.now() + '.' + Math.random() + '.html');
   this.ps = null;
   this.server = null;
   this.stdall = PassThrough();
