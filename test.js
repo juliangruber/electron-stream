@@ -118,7 +118,7 @@ test('no node integration', function(t){
   browser.end('console.log(!!process.version);window.close();');
 });
 
-test('node integraetion', function(t){
+test('node integration', function(t){
   var browser = electron({
     nodeIntegration: true
   });
@@ -169,4 +169,13 @@ test('utf8', function(t){
     t.end();
   }));
   browser.end('var ಠ = "ಠ";console.log(ಠ);window.close();');
+});
+
+test('closing scripts do not break', function(t){
+  var browser = electron();
+  browser.pipe(concat(function(data){
+    t.equal(data.toString(), '</script>\n');
+    t.end();
+  }));
+  browser.end('console.log("</script>");window.close();');
 });
