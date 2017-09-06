@@ -9,6 +9,7 @@ var electron = require('electron');
 var debug = require('debug')('electron-stream');
 var stringify = require('json-stringify-safe');
 var http = require('http');
+var tempy = require('tempy');
 
 var runner = join(__dirname, 'lib', 'runner.js');
 
@@ -23,7 +24,12 @@ function Electron(opts){
   this.opts.nodeIntegration = this.opts.nodeIntegration || this.opts.node;
   this.source = new PassThrough();
   this.basedir = this.opts.basedir || process.cwd();
-  this.sourceFile = join(this.basedir, '.source.' + Date.now() + '.' + Math.random() + '.html');
+
+  // nodeIntegration requires the sourcefile to be in the cwd, but otherwise it should be a temp file.
+  this.sourceFile = this.opts.nodeIntegration
+    ? join(this.basedir, '.source.' + Date.now() + '.' + Math.random() + '.html')
+    : tempy.file({extension: 'html'});
+
   this.ps = null;
   this.server = null;
   this.stdall = PassThrough();
@@ -51,12 +57,15 @@ Electron.prototype._read = function(){
 
 Electron.prototype._onfinish = function(){
   var self = this;
+  var cb = this._spawn.bind(this)
   if (this.killed) return;
   this.source.push(null);
 
-  this._createSourceUrl(function(url){
-    self._spawn(url);
-  });
+  if (this.opts.nodeIntegration) {
+    return this._createNodeUrl(cb)
+  }
+
+  this._createSourceUrl(cb);
 };
 
 Electron.prototype._spawn = function(url){
@@ -79,25 +88,44 @@ Electron.prototype._spawn = function(url){
   });
 };
 
-Electron.prototype._createSourceUrl = function(cb){
+Electron.prototype._createNodeUrl = function(cb){
   var self = this;
   var ws = fs.createWriteStream(this.sourceFile);
   ws.write('<!DOCTYPE html><meta charset="utf8"><body><script>');
+  ws.on('finish', function(){
+    if (self.opts.nodeIntegration) return cb('file://' + self.sourceFile);
+  })
   this.source
-    .on('end', function () {
-      ws.on('finish', function(){
-        if (self.opts.nodeIntegration) return cb('file://' + self.sourceFile);
-        self.server = http.createServer(function(req, res){
-          fs.createReadStream(self.sourceFile).pipe(res);
-        });
-        self.server.listen(function(){
-          cb('http://localhost:' + this.address().port);
-        });
-      });
-      ws.end('</script></body>');
-    })
-    .pipe(ws, { end: false });
+    .on('end', () => ws.end('</script></body>'))
+    .pipe(ws, { end: false })
 };
+
+Electron.prototype._createSourceUrl = function(cb){
+  var self = this;
+  var ws = fs.createWriteStream(this.sourceFile);
+  self.source.pipe(ws);
+  ws.on('finish', function() {
+    if (self.opts.nodeIntegration) return cb('file://' + self.sourceFile);
+    self._startServer()
+    self.server.listen(function(){
+      cb('http://localhost:' + this.address().port);
+    });
+  });
+};
+
+Electron.prototype._startServer = function() {
+  var self = this;
+  var html = `<!DOCTYPE html><meta charset="utf8"><body><script src="/bundle.js"></script></body>`
+  self.server = http.createServer(function(req, res){
+    if (req.url == '/bundle.js') {
+      res.setHeader('Content-Type', 'application/js');
+      fs.createReadStream(self.sourceFile).pipe(res);
+      return;
+    }
+    res.setHeader('Content-Type', 'text/html')
+    res.end(html)
+  });
+}
 
 Electron.prototype._cleanup = function(){
   if (this.server) this.server.close();
