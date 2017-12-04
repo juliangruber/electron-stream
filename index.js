@@ -10,6 +10,7 @@ var debug = require('debug')('electron-stream');
 var stringify = require('json-stringify-safe');
 var http = require('http');
 var tempy = require('tempy');
+var ecstatic = require('ecstatic');
 
 var runner = join(__dirname, 'lib', 'runner.js');
 
@@ -113,17 +114,29 @@ Electron.prototype._createSourceUrl = function(cb){
   });
 };
 
-Electron.prototype._startServer = function() {
+Electron.prototype._startServer = function(){
   var self = this;
-  var html = `<!DOCTYPE html><meta charset="utf8"><body><script src="/bundle.js"></script></body>`
+  function serveHTML(res){
+    res.setHeader('Content-Type', 'text/html');
+    res.end(`<!DOCTYPE html><meta charset="utf8"><body><script src="/bundle.js"></script></body>`);
+  }
   self.server = http.createServer(function(req, res){
     if (req.url == '/bundle.js') {
       res.setHeader('Content-Type', 'application/js');
       fs.createReadStream(self.sourceFile).pipe(res);
       return;
     }
-    res.setHeader('Content-Type', 'text/html')
-    res.end(html)
+    if (self.opts.static) {
+      ecstatic({
+        root: self.opts.static,
+        handleError: false,
+        showDir: false
+      })(req, res, function(err){
+        serveHTML(res);
+      })
+      return;
+    }
+    serveHTML(res);
   });
 }
 

@@ -1,6 +1,7 @@
 var electron = require('./');
 var test = require('tape');
 var concat = require('concat-stream');
+var fs = require('fs');
 
 test('stdout', function(t){
   var browser = electron();
@@ -179,3 +180,13 @@ test('closing scripts do not break', function(t){
   }));
   browser.end('console.log("</script>");window.close();');
 });
+
+test('static', function(t){
+  var browser = electron({ static: __dirname });
+  browser.pipe(concat(function(data){
+    t.equal(data.toString().trim(), fs.readFileSync(`${__dirname}/test.js`).toString().trim());
+    t.end();
+  }));
+  browser.end('fetch("/test.js").then(res => res.text()).then(text => {console.log(text); window.close()});');
+})
+
