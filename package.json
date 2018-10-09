@@ -9,13 +9,13 @@
   "devDependencies": {
     "concat-stream": "^1.5.1",
     "minimist": "^1.2.0",
-    "tape": "^4.2.2"
+    "tape": "^4.9.1"
   },
   "license": "MIT",
   "dependencies": {
-    "debug": "^2.6.1",
+    "debug": "^4.1.0",
     "ecstatic": "^3.0.0",
-    "electron": "^1.8.4",
+    "electron": "^3.0.3",
     "json-stringify-safe": "^5.0.1",
     "stream-read": "^1.1.2",
     "tempy": "0.1.0"
