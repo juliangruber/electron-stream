@@ -1,6 +1,6 @@
 {
   "name": "electron-stream",
-  "version": "6.0.0",
+  "version": "7.0.0",
   "description": "Simple streaming wrapper around electron",
   "scripts": {
     "test": "make test"
