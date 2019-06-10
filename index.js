@@ -62,6 +62,13 @@ Electron.prototype._onfinish = function(){
   if (this.killed) return;
   this.source.push(null);
 
+  // When browser-run runs electron-stream,
+  // use the server booted by browser-run,
+  // instead of creating new one in _createSourceUrl.
+  if (this.opts.loc) {
+    return cb(this.opts.loc);
+  }
+
   if (this.opts.nodeIntegration) {
     return this._createNodeUrl(cb)
   }

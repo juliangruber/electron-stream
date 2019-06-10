@@ -2,6 +2,7 @@ var electron = require('./');
 var test = require('tape');
 var concat = require('concat-stream');
 var fs = require('fs');
+var http = require('http');
 
 test('stdout', function(t){
   var browser = electron();
@@ -128,6 +129,38 @@ test('node integration', function(t){
     t.end();
   }));
   browser.end('console.log(!!process.version);window.close();');
+});
+
+test('support opts.loc for existing http server', function(t){
+  var server = http.createServer((req, res) => {
+    if (/^\/bundle\.js/.test(req.url)) {
+      res.setHeader('content-type', 'application/javascript');
+      res.setHeader('cache-control', 'no-cache');
+      res.end('console.log("hello");window.close();');
+      return;
+    }
+
+    if (req.url == '/') {
+      res.setHeader('Content-Type', 'text/html');
+      res.end(`<!DOCTYPE html><meta charset="utf8"><body><script src="/bundle.js"></script></body>`);
+      return;
+    }
+  });
+
+  server.listen(8000);
+
+  var browser = electron({
+    loc: 'http://localhost:8000'
+  });
+
+  browser.pipe(concat(function(data){
+    t.equal(data.toString(), 'hello\n');
+
+    server.close(function() {
+      t.end();
+    });
+  }));
+  browser.end();
 });
 
 test('require node modules', function(t){
