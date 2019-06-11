@@ -62,9 +62,9 @@ Electron.prototype._onfinish = function(){
   if (this.killed) return;
   this.source.push(null);
 
-  // When browser-run runs electron-stream,
-  // use the server booted by browser-run,
-  // instead of creating new one in _createSourceUrl.
+  // Use existing http(s) server with {loc: 'http://url'},
+  // this skips creating inner http server in _createSourceUrl.
+  // Use name "loc" because it's the property browser-run uses.
   if (this.opts.loc) {
     return cb(this.opts.loc);
   }
