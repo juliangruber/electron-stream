@@ -22,6 +22,34 @@ browser.write('window.close();');
 browser.end();
 ```
 
+  Alternatively, use an existing http server. Note you cannot write to electron-stream when outside http server is in use.
+
+```js
+var electron = require('electron-stream');
+var http = require('http');
+
+var server = http.createServer((req, res) => {
+  if (/^\/bundle\.js/.test(req.url)) {
+    res.setHeader('content-type', 'application/javascript');
+    res.setHeader('cache-control', 'no-cache');
+    res.end('console.log("hello");window.close();');
+    return;
+  }
+
+  if (req.url == '/') {
+    res.setHeader('Content-Type', 'text/html');
+    res.end(`<!DOCTYPE html><meta charset="utf8"><body><script src="/bundle.js"></script></body>`);
+    return;
+  }
+});
+
+server.listen(8000);
+var browser = electron({ loc: 'http://localhost:8000' });
+browser.pipe(process.stdout);
+browser.end();
+
+```
+
 ## Output streams
 
 `electron-stream` lets you read all of the console output together, or split up into `stdout` and `stderr`:
@@ -82,6 +110,7 @@ Options:
   - `node`:  Enable node integration. Defaults to `false`.
   - `basedir`: Set this if you need to require node modules in `node` mode
   - `static`: Serve static files from this directory at `/`
+  - `loc`: a full url like `http://localhost:8080/` for using an existing http server. When `loc` is supplied, options `node`, `basedir`, and `static` are all ignored.
 
 ### electron#stdout
 ### electron#stderr

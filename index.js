@@ -62,6 +62,13 @@ Electron.prototype._onfinish = function(){
   if (this.killed) return;
   this.source.push(null);
 
+  // Use existing http(s) server with {loc: 'http://url'},
+  // this skips creating inner http server in _createSourceUrl.
+  // Use name "loc" because it's the property browser-run uses.
+  if (this.opts.loc) {
+    return cb(this.opts.loc);
+  }
+
   if (this.opts.nodeIntegration) {
     return this._createNodeUrl(cb)
   }
