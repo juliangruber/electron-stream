@@ -231,3 +231,12 @@ test('supports async functions', function(t){
   }));
   browser.end('const f=async()=>\'ok\';f().then(t=>{console.log(t);window.close()});');
 });
+
+test('supports async generators', function(t){
+  var browser = electron();
+  browser.pipe(concat(function(data){
+    t.equal(data.toString(), 'ok\n');
+    t.end();
+  }));
+  browser.end('async function* f(){yield \'ok\'};f().next().then(o=>{console.log(o.value);window.close()});');
+});
