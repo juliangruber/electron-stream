@@ -240,3 +240,12 @@ test('supports async generators', function(t){
   }));
   browser.end('async function* f(){yield \'ok\'};f().next().then(o=>{console.log(o.value);window.close()});');
 });
+
+test('supports async iteration', function(t){
+  var browser = electron();
+  browser.pipe(concat(function(data){
+    t.equal(data.toString(), 'ok\n');
+    t.end();
+  }));
+  browser.end('async function* f(){yield \'ok\'};(async ()=>{for await (const o of f())console.log(o);})().then(()=>window.close());');
+});
