@@ -223,3 +223,11 @@ test('static', function(t){
   browser.end('fetch("/test.js").then(res => res.text()).then(text => {console.log(text); window.close()});');
 })
 
+test('supports async functions', function(t){
+  var browser = electron();
+  browser.pipe(concat(function(data){
+    t.equal(data.toString(), 'ok\n');
+    t.end();
+  }));
+  browser.end('const f=async()=>\'ok\';f().then(t=>{console.log(t);window.close()});');
+});
