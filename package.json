@@ -15,7 +15,7 @@
   "dependencies": {
     "debug": "^4.1.0",
     "ecstatic": "^4.1.2",
-    "electron": "^5.0.0",
+    "electron": "^7.2.4",
     "json-stringify-safe": "^5.0.1",
     "stream-read": "^1.1.2",
     "tempy": "0.1.0"
