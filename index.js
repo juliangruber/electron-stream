@@ -120,7 +120,8 @@ Electron.prototype._spawn = function(url){
       .join('')
       .trim()
       .split('\n')
-    console.log(lst.slice(1).join(''))
+    var str = lst.slice(1).join('')
+    if (str) console.log(str)
   });
 };
 
