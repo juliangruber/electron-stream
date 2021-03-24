@@ -80,7 +80,10 @@ Electron.prototype._spawn = function(url){
   debug('spawn %s', url);
 
   var self = this;
-  var ps = self.ps = spawn(electron, [runner], {
+  var electronOpts = []
+  if (!self.opts.sandbox) electronOpts.push('--no-sandbox')
+
+  var ps = self.ps = spawn(electron, [runner, ...electronOpts], {
     stdio: [null, null, null, 'ipc']
   });
 
@@ -93,6 +96,31 @@ Electron.prototype._spawn = function(url){
       case 'stdout': self.stdout.write(msg[1]); break;
       case 'stderr': self.stderr.write(msg[1]); break;
     }
+  });
+
+  // these event callbacks below will display the output and/or error 
+  // streams from an optional background process like Xvfb when running
+  // headless in a container, otherwise electron can fail silently
+  const errs = [], outs = [];
+  ps.stdout.on('data', function(data) {
+    outs.push(data)
+  });
+
+  ps.stderr.on('data', function(data) {
+    errs.push(data)
+  });
+
+  ps.on('close', function(code) {
+    const err = errs.join('').trim()
+    if (err.length) {
+      console.error(err)
+      return
+    }
+    var lst = outs
+      .join('')
+      .trim()
+      .split('\n')
+    console.log(lst.slice(1).join(''))
   });
 };
 
