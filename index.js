@@ -109,7 +109,7 @@ Electron.prototype._spawn = function(url){
 
   ps.on('close', function(code) {
     if (errs.length) {
-      self.emit('error', new Error(errs.join('').trim())
+      self.emit('error', new Error(errs.join('').trim()))
       return
     }
   })
