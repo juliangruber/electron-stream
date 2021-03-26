@@ -108,9 +108,8 @@ Electron.prototype._spawn = function(url){
   });
 
   ps.on('close', function(code) {
-    const err = errs.join('').trim()
-    if (err.length) {
-      console.error(err)
+    if (errs.length) {
+      self.emit('error', new Error(errs.join('').trim())
       return
     }
   })
