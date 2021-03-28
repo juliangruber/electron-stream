@@ -81,8 +81,8 @@ Electron.prototype._spawn = function(url){
   debug('spawn %s', url);
 
   const self = this;
-  const args = [runner]
-  if (!self.opts.sandbox) args.push('--no-sandbox')
+  const args = [runner];
+  if (!this.sandbox) args.push('--no-sandbox');
 
   const ps = self.ps = spawn(electron, args, {
     stdio: [null, null, null, 'ipc']
