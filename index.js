@@ -25,7 +25,7 @@ function Electron(opts){
   this.opts.nodeIntegration = this.opts.nodeIntegration || this.opts.node;
   this.source = new PassThrough();
   this.basedir = this.opts.basedir || process.cwd();
-  this.sandbox = 'sandbox' in this.opts ? this.opts.sandbox : true;
+  this.sandbox = this.opts.sandbox !== false;
  
   // nodeIntegration requires the sourcefile to be in the cwd, but otherwise it should be a temp file.
   this.sourceFile = this.opts.nodeIntegration
@@ -102,15 +102,14 @@ Electron.prototype._spawn = function(url){
   // these event callbacks below will display the output and/or error 
   // streams from an optional background process like Xvfb when running
   // headless in a container, otherwise electron can fail silently
-  const errs = [];
+  const stderr = [];
   ps.stderr.on('data', function(data) {
-    errs.push(data)
+    stderr.push(data)
   });
 
   ps.on('close', function(code) {
-    if (errs.length) {
-      self.emit('error', new Error(errs.join('').trim()))
-      return
+    if (stderr.length) {
+      self.emit('error', new Error(stderr.join('').trim()))
     }
   })
 };
