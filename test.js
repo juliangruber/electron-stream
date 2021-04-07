@@ -249,3 +249,13 @@ test('supports async iteration', function(t){
   }));
   browser.end('async function* f(){yield \'ok\'};(async ()=>{for await (const o of f())console.log(o);})().then(()=>window.close());');
 });
+
+test('no sandbox', function(t){
+  var browser = electron({sandbox: false});
+  browser.pipe(concat(function(data){
+    t.equal(data.toString(), `${message}\n`);
+    t.end();
+  }));
+  const message = 'hello, world!'
+  browser.end(`console.log("${message}");window.close();`);
+});
