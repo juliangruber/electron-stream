@@ -111,7 +111,8 @@ Options:
   - `basedir`: Set this if you need to require node modules in `node` mode
   - `static`: Serve static files from this directory at `/`
   - `loc`: a full url like `http://localhost:8080/` for using an existing http server. When `loc` is supplied, options `node`, `basedir`, and `static` are all ignored.
-
+  - `no-sandbox`: Set this to run electron outside of a sandbox, may be required in a docker container to display stderr instead of a silent failure                                                              
+  
 ### electron#stdout
 ### electron#stderr
 ### electron#stdall
