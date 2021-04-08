@@ -4,7 +4,7 @@ var electron = require('..');
 var minimist = require('minimist');
 
 var argv = minimist(process.argv.slice(2), {
-  boolean: 'node',
+  boolean: ['node', 'sandbox'],
   alias: {
     nodeIntegration: 'node',
     'node-integration': 'node'

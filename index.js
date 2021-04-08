@@ -25,7 +25,8 @@ function Electron(opts){
   this.opts.nodeIntegration = this.opts.nodeIntegration || this.opts.node;
   this.source = new PassThrough();
   this.basedir = this.opts.basedir || process.cwd();
-
+  this.sandbox = this.opts.sandbox !== false;
+ 
   // nodeIntegration requires the sourcefile to be in the cwd, but otherwise it should be a temp file.
   this.sourceFile = this.opts.nodeIntegration
     ? join(this.basedir, '.source.' + Date.now() + '.' + Math.random() + '.html')
@@ -79,8 +80,11 @@ Electron.prototype._onfinish = function(){
 Electron.prototype._spawn = function(url){
   debug('spawn %s', url);
 
-  var self = this;
-  var ps = self.ps = spawn(electron, [runner], {
+  const self = this;
+  const args = [runner];
+  if (!this.sandbox) args.push('--no-sandbox');
+
+  const ps = self.ps = spawn(electron, args, {
     stdio: [null, null, null, 'ipc']
   });
 
@@ -94,6 +98,20 @@ Electron.prototype._spawn = function(url){
       case 'stderr': self.stderr.write(msg[1]); break;
     }
   });
+
+  // these event callbacks below will display the output and/or error 
+  // streams from an optional background process like Xvfb when running
+  // headless in a container, otherwise electron can fail silently
+  const stderr = [];
+  ps.stderr.on('data', function(data) {
+    stderr.push(data)
+  });
+
+  ps.on('close', function(code) {
+    if (stderr.length) {
+      self.emit('error', new Error(stderr.join('').trim()))
+    }
+  })
 };
 
 Electron.prototype._createNodeUrl = function(cb){
