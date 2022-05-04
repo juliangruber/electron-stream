@@ -5,6 +5,8 @@ on:
   - pull_request
 jobs:
   test:
+    env:
+      DISPLAY: :0
     runs-on: ubuntu-latest
     strategy:
       matrix:
