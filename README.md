@@ -3,7 +3,7 @@
 
   Write JavaScript to `electron`, get console output back!
 
-  [![travis](https://travis-ci.org/juliangruber/electron-stream.svg?branch=master)](https://travis-ci.org/juliangruber/electron-stream)
+  [![CI](https://github.com/juliangruber/electron-stream/actions/workflows/ci.yml/badge.svg)](https://github.com/juliangruber/electron-stream/actions/workflows/ci.yml)
   [![downloads](https://img.shields.io/npm/dm/electron-stream.svg)](https://www.npmjs.org/package/electron-stream)
 
 ## Example
