@@ -18,7 +18,7 @@
     "electron": "^15.3.0",
     "json-stringify-safe": "^5.0.1",
     "stream-read": "^1.1.2",
-    "tempy": "0.1.0"
+    "tempy": "0.2.1"
   },
   "bin": {
     "electron-stream": "bin/bin.js"
