@@ -14,9 +14,9 @@
   "license": "MIT",
   "dependencies": {
     "debug": "^4.1.0",
-    "ecstatic": "^4.1.2",
     "electron": "^15.3.0",
     "json-stringify-safe": "^5.0.1",
+    "serve-handler": "^6.1.5",
     "stream-read": "^1.1.2",
     "tempy": "0.1.0"
   },
