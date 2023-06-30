@@ -1,0 +1,21 @@
+name: CI
+on:
+  - push
+  - pull_request
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node:
+          - 16
+          - 18
+          - 20
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node }}
+      - run: npm ci
+      - run: sudo apt-get install xvfb
+      - run: xvfb-run --auto-servernum npm test
