@@ -10,7 +10,7 @@ var debug = require('debug')('electron-stream');
 var stringify = require('json-stringify-safe');
 var http = require('http');
 var tempy = require('tempy');
-var ecstatic = require('ecstatic');
+var handler = require('serve-handler');
 
 var runner = join(__dirname, 'lib', 'runner.js');
 
@@ -152,13 +152,12 @@ Electron.prototype._startServer = function(){
       return;
     }
     if (self.opts.static) {
-      ecstatic({
-        root: self.opts.static,
-        handleError: false,
-        showDir: false
-      })(req, res, function(err){
-        serveHTML(res);
-      })
+      handler(req, res, {
+        public: self.opts.static,
+        directoryListing: false
+      }, {
+        sendError() { serveHTML(res) }
+      });
       return;
     }
     serveHTML(res);
