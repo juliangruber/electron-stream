@@ -14,7 +14,7 @@
   "license": "MIT",
   "dependencies": {
     "debug": "^4.1.0",
-    "electron": "^25.2.0",
+    "electron": "^26.2.0",
     "json-stringify-safe": "^5.0.1",
     "serve-handler": "^6.1.5",
     "stream-read": "^1.1.2",
