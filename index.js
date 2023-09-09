@@ -81,7 +81,7 @@ Electron.prototype._spawn = function(url){
   debug('spawn %s', url);
 
   const self = this;
-  const args = [runner, '--disable-gpu'];
+  const args = [runner];
   if (!this.sandbox) args.push('--no-sandbox');
 
   const ps = self.ps = spawn(electron, args, {
