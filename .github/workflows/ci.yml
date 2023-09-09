@@ -17,5 +17,4 @@ jobs:
         with:
           node-version: ${{ matrix.node }}
       - run: npm ci
-      - run: sudo apt-get install xvfb
       - run: xvfb-run --auto-servernum npm test
