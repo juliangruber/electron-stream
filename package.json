@@ -22,5 +22,8 @@
   },
   "bin": {
     "electron-stream": "bin/bin.js"
+  },
+  "engines": {
+    "node": ">=16"
   }
 }
